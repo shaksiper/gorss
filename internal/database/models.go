@@ -12,10 +12,10 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
-	Deleted   sql.NullBool
 	ApiKey    string
+	ID        uuid.UUID
+	Deleted   sql.NullBool
 }
