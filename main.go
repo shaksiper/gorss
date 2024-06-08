@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +10,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	"github.com/shaksiper/go-tutorial/internal/database"
+
+	_ "github.com/lib/pq" // postgres driver for sqlc
 )
+
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 	// read .env file
@@ -21,6 +29,22 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("Port is not specified")
+	}
+
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("Connection cannot be empty")
+	}
+
+	conn, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatal("Database connection could not be established")
+	}
+
+	queries := database.New(conn)
+
+	apiCfg := apiConfig{
+		DB: queries,
 	}
 
 	router := chi.NewRouter()
@@ -38,6 +62,9 @@ func main() {
 	v1Router := chi.NewRouter()
 	v1Router.HandleFunc("/ready", handlerReadiness)
 	v1Router.HandleFunc("/error", handlerErr)
+
+	v1Router.Post("/user", apiCfg.handlerCreateUser)
+
 	router.Mount("/v1", v1Router)
 
 	srv := &http.Server{
