@@ -64,6 +64,7 @@ func main() {
 	v1Router.HandleFunc("/error", handlerErr)
 
 	v1Router.Post("/user", apiCfg.handlerCreateUser)
+	v1Router.Get("/user", apiCfg.handlerGetUserByAPIKey)
 
 	router.Mount("/v1", v1Router)
 

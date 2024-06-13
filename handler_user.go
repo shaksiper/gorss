@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shaksiper/go-tutorial/internal/auth"
 	"github.com/shaksiper/go-tutorial/internal/database"
 )
 
@@ -34,5 +35,22 @@ func (apiCfg *apiConfig) handlerCreateUser(writer http.ResponseWriter, request *
 		return
 	}
 
-	respondWithJson(writer, 200, user)
+	respondWithJson(writer, 201, user)
+}
+
+// AUthenticated endpoint to retrieve user information
+func (apiCfg *apiConfig) handlerGetUserByAPIKey(writer http.ResponseWriter, request *http.Request) {
+	apiKey, err := auth.GetAPIKey(request.Header)
+	if err != nil {
+		respondWithError(writer, 403, fmt.Sprintf("Auth error: %v", err))
+		return
+	}
+
+	user, err := apiCfg.DB.GetUserByAPIKey(request.Context(), apiKey)
+	if err != nil {
+		respondWithError(writer, 400, fmt.Sprintf("Could not fetch the user: %v", err))
+        return
+	}
+
+	respondWithJson(writer, 200, databaseUserToUser(user))
 }
