@@ -20,7 +20,7 @@ func (apiCfg *apiConfig) handlerCreateUser(writer http.ResponseWriter, request *
 	decoder := json.NewDecoder(request.Body)
 	err := decoder.Decode(&params)
 	if err != nil {
-		respondWithError(writer, 200, fmt.Sprintf("Error parsing JSON: %v", err))
+		respondWithError(writer, 412, fmt.Sprintf("Error parsing JSON: %v", err))
 		return
 	}
 
