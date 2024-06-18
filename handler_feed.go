@@ -13,7 +13,7 @@ import (
 func (apicfg *apiConfig) handlerCreateFeed(writer http.ResponseWriter, request *http.Request, user database.User) {
 	type parameters struct {
 		Name string `json:"name"`
-        URL string `json:"url"`
+		URL  string `json:"url"`
 	}
 
 	params := parameters{}
@@ -39,4 +39,14 @@ func (apicfg *apiConfig) handlerCreateFeed(writer http.ResponseWriter, request *
 	}
 
 	respondWithJson(writer, 201, feed)
+}
+
+func (apicfg *apiConfig) handlerGetFeeds(writer http.ResponseWriter, request *http.Request) {
+	feeds, err := apicfg.DB.GetFeeds(request.Context())
+	if err != nil {
+		respondWithError(writer, 400, fmt.Sprintf("Could not retrieve feeds: %v", err))
+		return
+	}
+
+	respondWithJson(writer, 200, databaseFeedsToFeeds(feeds))
 }

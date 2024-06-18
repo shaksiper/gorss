@@ -66,6 +66,9 @@ func main() {
 	v1Router.Post("/user", apiCfg.handlerCreateUser)
 	v1Router.Get("/user", apiCfg.middlewareAuth(apiCfg.handlerGetUserByAPIKey))
 
+	v1Router.Post("/feed", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
+	v1Router.Get("/feed", apiCfg.handlerGetFeeds)
+
 	router.Mount("/v1", v1Router)
 
 	srv := &http.Server{
