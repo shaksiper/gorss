@@ -5,7 +5,6 @@
 package database
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,6 +14,7 @@ type Feed struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Deleted   bool
 	Name      string
 	Url       string
 	UserID    uuid.UUID
@@ -25,6 +25,6 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Name      string
-	Deleted   sql.NullBool
+	Deleted   bool
 	ApiKey    string
 }
