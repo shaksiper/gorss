@@ -54,7 +54,7 @@ func (apiCfg *apiConfig) handlerDeleteFeedFollowed(writer http.ResponseWriter, r
 	feedFollowedIDRaw := chi.URLParam(request, "feedFollowedID")
 	feedFollowedID, err := uuid.Parse(feedFollowedIDRaw)
 	if err != nil {
-		respondWithError(writer, 400, fmt.Sprintf("Could not parse feed ID", user.ID, err))
+		respondWithError(writer, 400, fmt.Sprintf("Could not parse feed ID (%s): %v", user.ID, err))
 		return
 	}
 	// TODO: make this return deleated feed info
