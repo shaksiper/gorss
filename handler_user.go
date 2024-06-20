@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/shaksiper/go-tutorial/internal/database"
+	"github.com/shaksiper/gorss/internal/database"
 )
 
 func (apiCfg *apiConfig) handlerCreateUser(writer http.ResponseWriter, request *http.Request) {

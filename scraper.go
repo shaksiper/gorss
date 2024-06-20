@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/shaksiper/go-tutorial/internal/database"
+	"github.com/shaksiper/gorss/internal/database"
 )
 
 func startScraping(db *database.Queries, concurrency int, timeBetweenReq time.Duration) {

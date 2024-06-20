@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-	"github.com/shaksiper/go-tutorial/internal/database"
+	"github.com/shaksiper/gorss/internal/database"
 
 	_ "github.com/lib/pq" // postgres driver for sqlc
 )

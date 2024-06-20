@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/shaksiper/go-tutorial/internal/auth"
-	"github.com/shaksiper/go-tutorial/internal/database"
+	"github.com/shaksiper/gorss/internal/auth"
+	"github.com/shaksiper/gorss/internal/database"
 )
 
 type authedHandler func(http.ResponseWriter, *http.Request, database.User)

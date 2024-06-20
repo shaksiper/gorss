@@ -1,4 +1,4 @@
-module github.com/shaksiper/go-tutorial
+module github.com/shaksiper/gorss
 
 go 1.21.8
 
