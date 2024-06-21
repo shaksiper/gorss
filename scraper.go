@@ -46,7 +46,7 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) RS
 
 	rssFeed, err := urlToFeed(feed.Url)
 	if err != nil {
-		log.Fatalf("Error: fetching feed [%v] failed: %v", feed.ID, err)
+		log.Printf("Error: fetching feed [%v] failed: %v", feed.ID, err)
 		return RSSFeed{}
 	}
 
@@ -79,7 +79,7 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) RS
 			if strings.Contains(err.Error(), "duplicate key") {
 				continue
 			}
-			log.Fatalf("Could not create post for %v: %v", feed.ID, err)
+			log.Printf("Could not create post for %v: %v", feed.ID, err)
 		}
 	}
 
