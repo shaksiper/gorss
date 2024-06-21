@@ -8,8 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"github.com/shaksiper/gorss/internal/database"
 
@@ -51,38 +49,42 @@ func main() {
 
 	go startScraping(db, 10, time.Minute)
 
-	router := chi.NewRouter()
-	router.Use(
-		cors.Handler(cors.Options{
-			AllowedOrigins:   []string{"https://*", "http://*"},
-			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"*"},
-			ExposedHeaders:   []string{"Link"},
-			AllowCredentials: false,
-			MaxAge:           300,
-		}),
-	)
+	// router := chi.NewRouter()
 
-	v1Router := chi.NewRouter()
-	v1Router.HandleFunc("/ready", handlerReadiness)
-	v1Router.HandleFunc("/error", handlerErr)
+	// router.Use(
+	// 	cors.Handler(cors.Options{
+	// 		AllowedOrigins:   []string{"https://*", "http://*"},
+	// 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	// 		AllowedHeaders:   []string{"*"},
+	// 		ExposedHeaders:   []string{"Link"},
+	// 		AllowCredentials: false,
+	// 		MaxAge:           300,
+	// 	}),
+	// )
 
-	v1Router.Post("/user", apiCfg.handlerCreateUser)
-	v1Router.Get("/user", apiCfg.middlewareAuth(apiCfg.handlerGetUserByAPIKey))
+	// router := chi.NewRouter()
+	router := http.NewServeMux()
+	router.HandleFunc("/ready", handlerReadiness)
+	router.HandleFunc("/error", handlerErr)
 
-	v1Router.Post("/feed", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
-	v1Router.Get("/feed", apiCfg.handlerGetFeeds)
+	router.HandleFunc("POST /user", apiCfg.handlerCreateUser)
+	router.HandleFunc("GET /user", apiCfg.middlewareAuth(apiCfg.handlerGetUserByAPIKey))
 
-	v1Router.Post("/feed_follow", apiCfg.middlewareAuth(apiCfg.handlerFollowFeed))
-	v1Router.Get("/feed_follow", apiCfg.middlewareAuth(apiCfg.handlerGetFeedFollowed))
-	v1Router.Delete("/feed_follow/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerDeleteFeedFollowed))
+	router.HandleFunc("POST /feed", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
+	router.HandleFunc("GET /feed", apiCfg.handlerGetFeeds)
 
-	v1Router.Get("/post", apiCfg.middlewareAuth(apiCfg.handlerGetPostsForUser))
+	router.HandleFunc("POST /feed_follow", apiCfg.middlewareAuth(apiCfg.handlerFollowFeed))
+	router.HandleFunc("GET /feed_follow", apiCfg.middlewareAuth(apiCfg.handlerGetFeedFollowed))
+	router.HandleFunc("DELETE /feed_follow/{feedFollowID}", apiCfg.middlewareAuth(apiCfg.handlerDeleteFeedFollowed))
 
-	router.Mount("/v1", v1Router)
+	router.HandleFunc("GET /post", apiCfg.middlewareAuth(apiCfg.handlerGetPostsForUser))
+
+	v1Router := http.NewServeMux()
+	v1Router.Handle("/v1/", http.StripPrefix("/v1", router))
+	// router.Mount("/v1", v1Router)
 
 	srv := &http.Server{
-		Handler: router,
+		Handler: corsMiddleware(v1Router),
 		Addr:    ":" + port,
 	}
 
@@ -93,4 +95,16 @@ func main() {
 	}
 
 	fmt.Println("Hello World")
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("AllowedOrigins", "https://* http://*")
+		w.Header().Set("AllowedMethods", "POST PUT DELETE OPTIONS")
+		w.Header().Set("AllowedHeaders", "*")
+		w.Header().Set("ExposedHeaders", "Link")
+		w.Header().Set("AllowCredentials", "false")
+		w.Header().Set("MaxAge", "300")
+		next.ServeHTTP(w, r)
+	})
 }
